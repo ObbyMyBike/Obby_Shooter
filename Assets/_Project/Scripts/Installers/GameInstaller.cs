@@ -5,6 +5,7 @@ using Zenject;
 public class GameInstaller : MonoInstaller
 {
     [SerializeField] private CharacterConfig _settings;
+    [SerializeField] private EnemyConfig _enemySettings;
     [SerializeField] private Camera _playerCamera;
     [SerializeField] private WeaponView _weaponView;
 
@@ -16,12 +17,17 @@ public class GameInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        Container.Bind<ILocalizationService>().To<LocalizationData>().FromScriptableObjectResource("Game/Localization")
-            .AsSingle();
-        
-        Container.Bind<GenericPool<Bullet>>().AsSingle().WithArguments(_settings.BulletPrefab, (Transform)null, _settings.BulletPoolSize);
-        Container.Bind<BulletCollision>().To<BulletCollision>().AsSingle();
+        Container.Bind<ILocalizationService>().To<LocalizationData>().FromScriptableObjectResource("Game/Localization").AsSingle();
 
+        Container.Bind<GenericPool<Bullet>>().AsSingle().WithArguments(_settings.BulletPrefab, (Transform)null, _settings.BulletPoolSize);
+        Container.Bind<BulletCollision>().AsSingle();
+        
+        Container.Bind<GenericPool<Enemy>>().AsSingle().WithArguments(_enemySettings.EnemyPrefab, (Transform)null, _enemySettings.EnemyPoolSize);
+        Container.BindInstance(_enemySettings).AsSingle();
+        Container.BindInterfacesAndSelfTo<EnemySpawner>().FromComponentInHierarchy().AsSingle().NonLazy();
+        
+        Container.Bind<HealthBarView>().FromComponentInHierarchy().AsSingle().NonLazy();
+        
         Container.BindInstance(_settings).AsSingle();
         Container.BindInstance(_joystick).AsSingle();
         Container.BindInstance(_fireButton).AsSingle();
@@ -35,14 +41,14 @@ public class GameInstaller : MonoInstaller
 #endif
 
         Container.Bind<Camera>().FromInstance(_playerCamera).AsSingle();
-        
+
         Container.BindInstance(_weaponView).AsSingle();
         Container.BindInterfacesAndSelfTo<ShotgunController>().AsSingle().NonLazy();
 
+        Container.Bind<PlayerMovement>().FromComponentInHierarchy().AsSingle().NonLazy();
+        Container.Bind<FirstPersonCamera>().FromComponentInHierarchy().AsSingle().NonLazy();
+        
         Container.Bind<HealthModel>().AsSingle().WithArguments(_settings.BaseHealth);
         Container.Bind<CharacterStats>().AsSingle();
-
-        Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle().NonLazy();
-        Container.Bind<FirstPersonCamera>().FromComponentInHierarchy().AsSingle().NonLazy();
     }
 }
