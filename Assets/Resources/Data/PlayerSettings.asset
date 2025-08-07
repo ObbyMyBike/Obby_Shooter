@@ -12,11 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29daf7a5f2d74055aef625eeec3fcdc7, type: 3}
   m_Name: PlayerSettings
   m_EditorClassIdentifier: 
-  SpeedMovement: 5
-  BaseHealth: 100
-  BaseDamage: 5
-  BaseBulletSpeed: 0
+  CurrentBaseSpeedMovement: 5
+  CurrentBaseHealth: 200
+  CurrentBaseDamage: 10
+  BulletSpeed: 100
   FireRate: 5
   Range: 100
   BulletPoolSize: 20
+  MaxSpeed: 10
+  MaxHealth: 200
+  MaxDamage: 20
+  <BulletPrefab>k__BackingField: {fileID: 6832487707128511376, guid: 373cddd593ea56e439592eb0404a941a,
+    type: 3}
   <FireButton>k__BackingField: 323
