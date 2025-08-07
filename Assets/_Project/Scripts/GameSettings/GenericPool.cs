@@ -25,6 +25,8 @@ public class GenericPool<T> where T : Component
     public T Create(Vector3 position, Quaternion rotation)
     {
         T item = _stack.Count > 0 ? _stack.Pop() : Object.Instantiate(_prefab, _parent);
+        
+        item.transform.SetParent(null);
         item.transform.SetPositionAndRotation(position, rotation);
         item.gameObject.SetActive(true);
         

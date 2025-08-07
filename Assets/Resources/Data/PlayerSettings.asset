@@ -15,8 +15,10 @@ MonoBehaviour:
   SpeedMovement: 5
   BaseHealth: 100
   BaseDamage: 5
-  BaseBulletSpeed: 0
+  BaseBulletSpeed: 100
   FireRate: 5
   Range: 100
   BulletPoolSize: 20
+  <BulletPrefab>k__BackingField: {fileID: 6832487707128511376, guid: 373cddd593ea56e439592eb0404a941a,
+    type: 3}
   <FireButton>k__BackingField: 323
