@@ -27,8 +27,8 @@ public class WeaponBase : IInitializable, IDisposable, IDamageDealer
         this.collisionMask = view.CollisionLayers;
         this.fireRate = config.FireRate;
         this.range = config.Range;
-        this.bulletSpeed = config.BaseBulletSpeed;
-        Damage = config.BaseDamage;
+        this.bulletSpeed = config.BulletSpeed;
+        Damage = config.CurrentBaseDamage;
     }
 
     public float Damage { get; }

@@ -36,7 +36,7 @@ public class PlayerMovement : MonoBehaviour
                 Vector3 right = Vector3.ProjectOnPlane(_camera.transform.right,   Vector3.up).normalized;
                 Vector3 moveDirection = right * direction.x + forward * direction.y;
 
-                _characterController.Move(moveDirection * (_settings.SpeedMovement * Time.deltaTime));
+                _characterController.Move(moveDirection * (_settings.CurrentBaseSpeedMovement * Time.deltaTime));
             });
 #endif
     }

@@ -4,7 +4,7 @@ using Zenject;
 
 public class GameInstaller : MonoInstaller
 {
-    [SerializeField] private CharacterConfig _settings;
+    [SerializeField] private CharacterConfig _playerSettings;
     [SerializeField] private EnemyConfig _enemySettings;
     [SerializeField] private Camera _playerCamera;
     [SerializeField] private WeaponView _weaponView;
@@ -17,18 +17,30 @@ public class GameInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
+#if UNITY_STANDALONE || UNITY_EDITOR
+        _uiCanvas.gameObject.SetActive(false);
+#elif UNITY_ANDROID || UNITY_IOS
+        _uiCanvas.gameObject.SetActive(true);
+#endif
+            
         Container.Bind<ILocalizationService>().To<LocalizationData>().FromScriptableObjectResource("Game/Localization").AsSingle();
 
-        Container.Bind<GenericPool<Bullet>>().AsSingle().WithArguments(_settings.BulletPrefab, (Transform)null, _settings.BulletPoolSize);
+        Container.Bind<GenericPool<Bullet>>().AsSingle().WithArguments(_playerSettings.BulletPrefab, (Transform)null, _playerSettings.BulletPoolSize);
         Container.Bind<BulletCollision>().AsSingle();
         
         Container.Bind<GenericPool<Enemy>>().AsSingle().WithArguments(_enemySettings.EnemyPrefab, (Transform)null, _enemySettings.EnemyPoolSize);
         Container.BindInstance(_enemySettings).AsSingle();
+        Container.Bind<UpgradeManager>().AsSingle();
         Container.BindInterfacesAndSelfTo<EnemySpawner>().FromComponentInHierarchy().AsSingle().NonLazy();
         
         Container.Bind<HealthBarView>().FromComponentInHierarchy().AsSingle().NonLazy();
+        Container.Bind<MenuController>().FromComponentInHierarchy().AsSingle().NonLazy();
+        Container.Bind<UpgradeUIController>().FromComponentInHierarchy().AsSingle().NonLazy();
+        Container.Bind<CharacterStatsPanel>().FromComponentInHierarchy().AsSingle().NonLazy();
         
-        Container.BindInstance(_settings).AsSingle();
+        Container.Bind<IStatPersistenceService>().To<StatPersistenceService>().AsSingle();
+        
+        Container.BindInstance(_playerSettings).AsSingle();
         Container.BindInstance(_joystick).AsSingle();
         Container.BindInstance(_fireButton).AsSingle();
         Container.BindInstance(_aimZoneRect).AsSingle();
@@ -48,7 +60,7 @@ public class GameInstaller : MonoInstaller
         Container.Bind<PlayerMovement>().FromComponentInHierarchy().AsSingle().NonLazy();
         Container.Bind<FirstPersonCamera>().FromComponentInHierarchy().AsSingle().NonLazy();
         
-        Container.Bind<HealthModel>().AsSingle().WithArguments(_settings.BaseHealth);
+        Container.Bind<HealthModel>().AsSingle().WithArguments(_playerSettings.CurrentBaseHealth);
         Container.Bind<CharacterStats>().AsSingle();
     }
 }

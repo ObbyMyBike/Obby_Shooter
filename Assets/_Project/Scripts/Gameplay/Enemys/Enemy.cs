@@ -28,12 +28,8 @@ public class Enemy : MonoBehaviour, IDamageable
 
         _health.Current.Subscribe(health =>
         {
-            Debug.Log($"[Enemy] HP = {health}/{_health.Max}");
-
             if (health <= 0f)
             {
-                Debug.Log("[Enemy] Died");
-
                 _death.OnNext(Unit.Default);
                 _death.OnCompleted();
 
@@ -49,12 +45,8 @@ public class Enemy : MonoBehaviour, IDamageable
     public void TakeDamage(float amount)
     {
         if (_health == null)
-        {
-            Debug.LogError("[Enemy] TakeDamage called but _health is NULL! Did you call Initialize()?");
             return;
-        }
-
-        Debug.Log($"[Enemy] TakeDamage({amount}) current before = {_health.Current.Value}");
+        
         _health.TakeDamage(amount);
     }
 }
