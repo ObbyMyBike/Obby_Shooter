@@ -29,13 +29,14 @@ public class CharacterStatsPanel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _damageMaxText;
 
     [Header("Other")]
-    [SerializeField] private KeyCode _resetKey = KeyCode.R;
+    [SerializeField] private Button _resetButton;
 
     private CharacterStats _stats;
     private UpgradeManager _upgrades;
     private MenuController _menu;
     private CharacterConfig _config;
     private HealthBarView _healthBarView;
+    private HealthModel _healthModel;  
     private IStatPersistenceService _persist;
 
     private float _originalSpeed;
@@ -47,7 +48,7 @@ public class CharacterStatsPanel : MonoBehaviour
 
     [Inject]
     public void Construct(CharacterStats stats, UpgradeManager upgrades, MenuController menu, CharacterConfig config,
-        HealthBarView healthBarView, IStatPersistenceService persist)
+        HealthBarView healthBarView, IStatPersistenceService persist, HealthModel healthModel)
     {
         _stats = stats;
         _upgrades = upgrades;
@@ -55,6 +56,7 @@ public class CharacterStatsPanel : MonoBehaviour
         _config = config;
         _healthBarView = healthBarView;
         _persist = persist;
+        _healthModel = healthModel;
     }
 
     private void Awake()
@@ -108,6 +110,7 @@ public class CharacterStatsPanel : MonoBehaviour
             _stats.Damage.Value = savedDmg;
         }
         
+        _healthModel.SetMax(savedHealth, keepRatio: false);
         _healthBarView.UpdateTrack(_stats.HealthMax.Value);
 
         _originalSpeed = _previewSpeed = _stats.Speed.Value;
@@ -138,7 +141,8 @@ public class CharacterStatsPanel : MonoBehaviour
                 _stats.UpgradeHealth(newValue);
                 _originalHealth = _previewHealth;
                 _config.CurrentBaseHealth = _originalHealth;
-                _healthBarView.UpdateTrack(_previewHealth);
+                _healthModel.SetMax(_originalHealth, keepRatio: true);
+                _healthBarView.UpdateTrack(_originalHealth);
                 _persist.SaveHealth(_originalHealth);
             }, _healthBar, _healthUpButton, _healthApplyButton, _healthMaxText));
         _damageApplyButton.onClick.AddListener(() => ApplyUpgrade(_previewDamage, _originalDamage, _config.MaxDamage,
@@ -149,26 +153,24 @@ public class CharacterStatsPanel : MonoBehaviour
                 _persist.SaveDamage(_originalDamage);
             }, _damageBar, _damageUpButton, _damageApplyButton, _damageMaxText));
 
+        if (_resetButton != null)
+            _resetButton.onClick.AddListener(OnReset);
+        
         _menu.MenuOpened += RefreshBars;
         _menu.MenuClosed += RevertAll;
 
         RefreshBars();
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(_resetKey))
-            OnReset();
     }
     
     private void OnReset()
     {
         _persist.ResetAll();
         
-        _stats.Speed.Value = _config.CurrentBaseSpeedMovement;
-        _stats.HealthMax.Value = _config.CurrentBaseHealth;
-        _stats.Damage.Value = _config.CurrentBaseDamage;
+        _stats.Speed.Value = _config.CurrentBaseSpeedMovement = _config.CurrentBaseSpeedMovement;;
+        _stats.HealthMax.Value = _config.CurrentBaseHealth = _config.CurrentBaseHealth;;
+        _stats.Damage.Value = _config.CurrentBaseDamage = _config.CurrentBaseDamage;
 
+        _healthModel.SetMax(_config.CurrentBaseHealth, keepRatio: false);
         _healthBarView.UpdateTrack(_config.CurrentBaseHealth);
         
         _originalSpeed = _previewSpeed = _config.CurrentBaseSpeedMovement;

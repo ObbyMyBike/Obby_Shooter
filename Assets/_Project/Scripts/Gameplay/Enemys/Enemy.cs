@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private readonly CompositeDisposable disposables = new CompositeDisposable();
     
     private HealthModel _health;
+    private EnemyMover _mover;
     private GenericPool<Enemy> _pool;
     private Subject<Unit> _death = new Subject<Unit>();
     
@@ -14,8 +16,14 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void OnDestroy()
     {
+        _mover?.Dispose();
         disposables.Dispose();
         _death?.Dispose();
+    }
+    
+    private void Update()
+    {
+        _mover?.Tick();
     }
     
     public void Initialize(GenericPool<Enemy> pool, EnemyConfig config)
@@ -34,19 +42,36 @@ public class Enemy : MonoBehaviour, IDamageable
                 _death.OnCompleted();
 
                 gameObject.SetActive(false);
+                _mover?.Dispose();
                 _pool.Recycle(this);
             }
         }).AddTo(disposables);
 
-        _health.Heal(_health.Max);
+        _health.SetMax(config.BaseHealth, keepRatio: false);
         gameObject.SetActive(true);
     }
 
+    public void SetupMover(EnemyConfig config, EnemyModeService modeService, Transform player, List<Transform> patrolPoints)
+    {
+        _mover?.Dispose();
+
+        TryGetComponent(out CharacterController controller);
+        
+        _mover = new EnemyMover(modeService, config, player, transform, controller);
+        
+        _mover.SetPatrolPoints(patrolPoints);
+    }
+    
     public void TakeDamage(float amount)
     {
         if (_health == null)
             return;
         
         _health.TakeDamage(amount);
+    }
+    
+    private void OnDrawGizmos()
+    {
+        _mover?.DrawGizmos();
     }
 }
