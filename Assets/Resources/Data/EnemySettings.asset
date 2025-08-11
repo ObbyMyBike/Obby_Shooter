@@ -13,6 +13,15 @@ MonoBehaviour:
   m_Name: EnemySettings
   m_EditorClassIdentifier: 
   BaseHealth: 50
+  MoveSpeed: 2.5
+  StopDistance: 3
+  TurnSpeed: 10
+  PointReachDistance: 0.25
+  DetectionRadius: 6
+  PointOccupyRadius: 1
+  EnemyMask:
+    serializedVersion: 2
+    m_Bits: 128
   EnemyPrefab: {fileID: 2536235612013402548, guid: 6b73825323a945b42ac4b5dc229b2b56,
     type: 3}
   EnemyPoolSize: 10

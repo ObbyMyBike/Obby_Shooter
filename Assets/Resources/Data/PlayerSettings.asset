@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayerSettings
   m_EditorClassIdentifier: 
   CurrentBaseSpeedMovement: 5
-  CurrentBaseHealth: 200
+  CurrentBaseHealth: 100
   CurrentBaseDamage: 10
   BulletSpeed: 100
   FireRate: 5

@@ -62,5 +62,8 @@ public class GameInstaller : MonoInstaller
         
         Container.Bind<HealthModel>().AsSingle().WithArguments(_playerSettings.CurrentBaseHealth);
         Container.Bind<CharacterStats>().AsSingle();
+        
+        Container.Bind<EnemyModeService>().AsSingle();
+        Container.Bind<EnemyAIModePanel>().FromComponentInHierarchy().AsSingle().NonLazy();
     }
 }
